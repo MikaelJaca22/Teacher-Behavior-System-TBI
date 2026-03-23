@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-nqmk#u4w-^+maxo+b_o2_ap@1g(04l!^6hf3sd#bqjp&_f6k!8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'unmarkable-dorthea-interspatially.ngrok-free.dev']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'dedicatedly-undecided-sloane.ngrok-free.dev']
 
 
 # Application definition
@@ -144,7 +144,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3001",
     "http://127.0.0.1:3001",
-    "https://unmarkable-dorthea-interspatially.ngrok-free.dev",
+    "https://dedicatedly-undecided-sloane.ngrok-free.dev",
     "https://teacher-behavior-system-tbi.vercel.app",
 ]
 

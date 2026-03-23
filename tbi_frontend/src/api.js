@@ -17,7 +17,7 @@ const localApi = urlParams.get("api");
 
 
 const api = axios.create({
-  baseURL: localApi ||  "https://unmarkable-dorthea-interspatially.ngrok-free.dev", // local testing
+  baseURL: localApi ||  "https://dedicatedly-undecided-sloane.ngrok-free.dev", // local testing
   headers: {
     "Content-Type": "application/json",
     "ngrok-skip-browser-warning": "true"
