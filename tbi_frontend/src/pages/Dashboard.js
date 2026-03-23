@@ -67,7 +67,7 @@ function Dashboard() {
       <div className="dashboard-page">
         {/* Hero */}
         <div className="dashboard-hero">
-          <h2 className="dashboard-title">Welcome, {userName} 👋</h2>
+          <h2 className="dashboard-title">Welcome, {userName}</h2>
           <p className="dashboard-subtitle">
             Select a teacher from the sidebar or the list below to begin your evaluation.
           </p>
