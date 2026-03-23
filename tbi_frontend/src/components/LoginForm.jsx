@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogIn, AlertCircle, Loader2 } from "lucide-react";
+import { LogIn, AlertCircle, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { auth, db } from "../lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import toast from "react-hot-toast";
+import Modal from "./Modal";
 import '../pages/Login.css';
 
 function LoginForm({ onSuccess }) {
@@ -13,6 +14,9 @@ function LoginForm({ onSuccess }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState("success"); // "success" or "error"
+  const [modalMessage, setModalMessage] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -26,15 +30,24 @@ function LoginForm({ onSuccess }) {
       if (snapshot.empty) {
         setError("Student ID not found.");
         toast.error("Student ID not found.");
+        // toast.error("Student ID not found."); // Original toast
+        setModalType("error");
+        setModalMessage("Student ID not found.");
+        setShowModal(true);
         setLoading(false);
         return;
       }
 
       const email = snapshot.docs[0].data().email;
       await signInWithEmailAndPassword(auth, email, password);
-      toast.success("Welcome back! Signing you in...");
+      setModalType("success");
+      setModalMessage("Welcome back! Signing you in...");
+      setShowModal(true);
       if (onSuccess) onSuccess();
-      navigate("/dashboard");
+      // Delay navigation to let user see the modal
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
     } catch (err) {
       console.error("Firebase Login Error:", err.code, err.message);
       let msg = "Login failed. Please try again.";
@@ -46,9 +59,19 @@ function LoginForm({ onSuccess }) {
         msg = "Too many failed attempts. Please try again later.";
       }
       setError(msg);
-      toast.error(msg);
+      // toast.error(msg); // Optional: if we want to also keep toast
+      setModalType("error");
+      setModalMessage(msg);
+      setShowModal(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    if (modalType === "success") {
+      navigate("/dashboard");
     }
   };
 
@@ -92,6 +115,24 @@ function LoginForm({ onSuccess }) {
           }
         </button>
       </form>
+
+      <Modal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        title={modalType === "success" ? "Success" : "Error"}
+      >
+        <div className="modal-inner-content">
+          {modalType === "success" ? (
+            <CheckCircle size={48} color="#4caf50" className="modal-icon" />
+          ) : (
+            <XCircle size={48} color="#f44336" className="modal-icon" />
+          )}
+          <p className="modal-text">{modalMessage}</p>
+          <button className="modal-action-btn" onClick={handleCloseModal}>
+            {modalType === "success" ? "Continue to Dashboard" : "Try Again"}
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

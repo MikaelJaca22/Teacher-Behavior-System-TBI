@@ -1,18 +1,24 @@
 import { auth, db } from "../lib/firebase";
 import React, { useState } from "react";
-import { UserPlus, AlertCircle, Loader2 } from "lucide-react";
+import { UserPlus, AlertCircle, Loader2, CheckCircle, XCircle } from "lucide-react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
+import Modal from "./Modal";
 import '../pages/Login.css';
+import { useNavigate } from "react-router-dom";
 
 function SignupForm({ onSuccess }) {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     firstName: "", lastName: "", studentID: "",
     email: "", password: "", confirmPassword: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState("success"); // "success" or "error"
+  const [modalMessage, setModalMessage] = useState("");
 
   const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
@@ -42,15 +48,31 @@ function SignupForm({ onSuccess }) {
         email: form.email,
         createdAt: new Date().toISOString(),
       });
-      toast.success("Account created successfully! Redirecting...");
+      setModalType("success");
+      setModalMessage("Account created successfully! Redirecting...");
+      setShowModal(true);
       if (onSuccess) onSuccess();
+      // Delay navigation
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     } catch (err) {
       console.error(err);
       const errorMessage = err.message.replace("Firebase: ", "");
       setError(errorMessage);
-      toast.error(errorMessage);
+      // toast.error(errorMessage);
+      setModalType("error");
+      setModalMessage(errorMessage);
+      setShowModal(true);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    if (modalType === "success") {
+      navigate("/login");
     }
   };
 
@@ -101,6 +123,24 @@ function SignupForm({ onSuccess }) {
           }
         </button>
       </form>
+
+      <Modal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        title={modalType === "success" ? "Registration Success" : "Registration Error"}
+      >
+        <div className="modal-inner-content">
+          {modalType === "success" ? (
+            <CheckCircle size={48} color="#4caf50" className="modal-icon" />
+          ) : (
+            <XCircle size={48} color="#f44336" className="modal-icon" />
+          )}
+          <p className="modal-text">{modalMessage}</p>
+          <button className="modal-action-btn" onClick={handleCloseModal}>
+            {modalType === "success" ? "Continue to Login" : "Try Again"}
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }
