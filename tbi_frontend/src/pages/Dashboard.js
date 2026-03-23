@@ -1,8 +1,17 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
 import DashboardLayout from "../components/DashboardLayout";
 import api from "../api";
+import { 
+  ClipboardList, 
+  Info, 
+  Loader2, 
+  GraduationCap, 
+  ChevronRight 
+} from "lucide-react";
 import "./Dashboard.css";
 
 function Dashboard() {
