@@ -1,0 +1,27 @@
+.navbar {
+  background: #ffffff;
+  padding: 0 1.5rem;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e8ecf1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0b4fa3;
+  margin: 0;
+}
+
+/* On mobile, push title to account for burger button */
+@media (max-width: 768px) {
+  .navbar-title {
+    padding-left: 48px;
+  }
+}

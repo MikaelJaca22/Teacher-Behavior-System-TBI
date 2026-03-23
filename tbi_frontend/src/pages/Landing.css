@@ -1,0 +1,171 @@
+/* ── Landing Page ── */
+.landing-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Background gradient */
+.landing-background {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #0033a0 0%, #0b4fa3 55%, #e30613 100%);
+  z-index: 0;
+}
+
+.landing-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+/* Decorative blobs */
+.landing-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.landing-blob-1 {
+  width: 500px;
+  height: 500px;
+  background: #fff;
+  top: -150px;
+  right: -100px;
+}
+
+.landing-blob-2 {
+  width: 350px;
+  height: 350px;
+  background: #e30613;
+  bottom: -100px;
+  left: -80px;
+}
+
+/* Hero content */
+.landing-hero {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 640px;
+  padding: 2.5rem 1.5rem;
+  color: #fff;
+  animation: heroFadeUp 0.9s ease forwards;
+}
+
+.landing-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 8px;
+  object-fit: contain;
+  margin-bottom: 1.25rem;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.landing-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  margin: 0 0 0.75rem;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+
+.landing-title span {
+  display: block;
+  font-size: clamp(0.9rem, 2vw, 1.1rem);
+  font-weight: 500;
+  opacity: 0.85;
+  letter-spacing: 0;
+  margin-top: 4px;
+}
+
+.landing-subtitle {
+  font-size: clamp(0.9rem, 2vw, 1.05rem);
+  margin: 0 0 2.25rem;
+  line-height: 1.7;
+  opacity: 0.9;
+}
+
+/* Buttons */
+.landing-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.landing-btn {
+  padding: 0.75rem 2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+
+.signup-btn {
+  background: #fff;
+  color: #0033a0;
+}
+
+.signup-btn:hover {
+  background: #e8f0fe;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+}
+
+.login-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+
+.login-btn:hover {
+  background: #e30613;
+  border-color: #e30613;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(227,6,19,0.35);
+}
+
+/* Footer tag */
+.landing-footer {
+  position: relative;
+  z-index: 2;
+  margin-top: 2rem;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.55);
+  text-align: center;
+}
+
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .landing-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  .landing-btn {
+    width: 100%;
+    justify-content: center;
+    max-width: 280px;
+  }
+}

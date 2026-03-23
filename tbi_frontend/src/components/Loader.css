@@ -1,0 +1,39 @@
+.loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0033A0; /* ACLC Blue */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loader-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.loader-overlay.hide {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-logo {
+  width: 150px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.loader-overlay p {
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-align: center;
+}

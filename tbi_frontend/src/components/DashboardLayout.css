@@ -1,0 +1,31 @@
+/* ── Root: full viewport, side-by-side flex ── */
+.layout-root {
+  display: flex;
+  height: 100vh;        /* exactly the viewport height */
+  overflow: hidden;     /* prevent the root itself from scrolling */
+}
+
+/* ── Right column: navbar + scrollable content ── */
+.layout-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;         /* allow shrinking past content width */
+  overflow: hidden;
+}
+
+/* ── Main content area: only this scrolls ── */
+.layout-main {
+  flex: 1;
+  overflow-y: auto;     /* scroll happens here, not the whole page */
+  background: #f3f6fb;
+  min-height: 0;        /* required for overflow-y to work inside flex */
+}
+
+/* ── Mobile: body takes full width when sidebar is a drawer ── */
+@media (max-width: 768px) {
+  .layout-root {
+    height: 100vh;
+    overflow: hidden;
+  }
+}

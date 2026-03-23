@@ -1,0 +1,267 @@
+/* ── Login / Signup shared layout ── */
+:root {
+  --blue: #0033a0;
+  --blue-dark: #002280;
+  --red: #e30613;
+  --border: #d1d5db;
+  --bg-input: #f9fafb;
+}
+
+.login-page {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* ── Left branding panel ── */
+.login-left {
+  flex: 1;
+  background: linear-gradient(160deg, #0033a0 0%, #0b4fa3 70%, #01256e 100%);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 3rem 2rem;
+  gap: 1rem;
+}
+
+.login-banner {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.12);
+  padding: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.login-left h1 {
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.4;
+  opacity: 0.95;
+}
+
+.login-left p {
+  font-size: 0.9rem;
+  opacity: 0.75;
+  margin: 0;
+}
+
+/* ── Right form panel ── */
+.login-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1.5rem;
+  background: url('../assets/aclc.jpg') no-repeat center center;
+  background-size: cover;
+  position: relative;
+}
+
+.login-right::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 20, 80, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.login-form-container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 2.5rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.login-form-container h2 {
+  color: var(--blue);
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0 0 1.5rem;
+}
+
+/* ── Name two-column grid (Signup) ── */
+.name-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Input fields ── */
+.input-group {
+  margin-bottom: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;       /* prevents grid child from blowing out */
+  box-sizing: border-box;
+}
+
+.input-group label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.input-group input {
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--bg-input);
+  color: #111;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(0, 51, 160, 0.12);
+  background: #fff;
+}
+
+.input-group input::placeholder {
+  color: #9ca3af;
+}
+
+/* ── Error ── */
+.error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--red);
+  font-size: 0.82rem;
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Submit button ── */
+.login-submit {
+  width: 100%;
+  padding: 11px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.login-submit:hover {
+  background: var(--red);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(227, 6, 19, 0.3);
+}
+
+.login-submit:active {
+  transform: translateY(0);
+}
+
+.login-submit:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Auth switch link ── */
+.auth-switch {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.83rem;
+  color: #6b7280;
+}
+
+.auth-link {
+  color: var(--blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+  color: var(--red);
+}
+
+/* ── Name grid (Signup) ── */
+.name-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 0.75rem;
+  min-width: 0; /* prevent overflow */
+}
+
+.name-grid .input-group {
+  min-width: 0; /* allow shrinking */
+}
+
+.name-grid .input-group input {
+  width: 100%;
+  box-sizing: border-box; /* include padding in width */
+  min-width: 0;
+}
+
+@media (max-width: 400px) {
+  .name-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Divider ── */
+.form-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  color: #d1d5db;
+  font-size: 0.8rem;
+}
+
+.form-divider::before,
+.form-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e5e7eb;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .login-left {
+    display: none;
+  }
+
+  .login-right {
+    flex: 1;
+    min-height: 100vh;
+    padding: 1.5rem 1rem;
+  }
+
+  .login-form-container {
+    padding: 2rem 1.5rem;
+  }
+}
