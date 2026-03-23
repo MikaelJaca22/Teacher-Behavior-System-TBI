@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../lib/firebase";
 import {
   User,
   BookOpen,
@@ -9,7 +12,6 @@ import {
   X,
   Loader2,
   AlertCircle,
- 
 } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import api from "../api";
@@ -34,20 +36,32 @@ function Evaluation() {
     email: "", uid: "", firstName: "", lastName: "", studentID: "",
   });
 
-  // Load student data (Placeholder - adjust to your new configuration)
+  // Load student data from Firebase/Firestore
   useEffect(() => {
-    const fetchStudentData = async () => {
-      // TODO: Implement student data fetching from your own backend
-      setStudentInfo({
-        email: "student@example.com",
-        uid: "placeholder-uid",
-        firstName: "Student",
-        lastName: "Name",
-        studentID: "2024-00001",
-      });
-    };
-    fetchStudentData();
-  }, []);
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setStudentInfo({
+              email: userData.email,
+              uid: firebaseUser.uid,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              studentID: userData.studentID,
+            });
+          }
+        } catch (err) {
+          console.error("Error fetching student data:", err);
+        }
+      } else {
+        // Not logged in
+        navigate("/login");
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate]);
 
   // Load teachers
   useEffect(() => {
