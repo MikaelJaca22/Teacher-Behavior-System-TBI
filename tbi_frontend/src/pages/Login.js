@@ -32,8 +32,16 @@ function Login() {
       await signInWithEmailAndPassword(auth, email, password);
       navigate("/dashboard");
     } catch (err) {
-      console.error(err);
-      setError("Login failed. Please check your credentials.");
+      console.error("Firebase Login Error:", err.code, err.message);
+      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") {
+        setError("Invalid password. Please try again.");
+      } else if (err.code === "auth/user-not-found") {
+        setError("Account not found for this Student ID.");
+      } else if (err.code === "auth/too-many-requests") {
+        setError("Too many failed attempts. Please try again later.");
+      } else {
+        setError(`Login failed: ${err.message}`);
+      }
     } finally {
       setLoading(false);
     }
