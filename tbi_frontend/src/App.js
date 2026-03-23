@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
@@ -19,9 +20,9 @@ function AppWrapper() {
     setLoading(true);
 
     const timer = setTimeout(() => {
-      setDisplayLocation(location); 
+      setDisplayLocation(location);
       setLoading(false);
-    }, 800); 
+    }, 800);
     return () => clearTimeout(timer);
   }, [location]);
 
@@ -48,9 +49,11 @@ function AppWrapper() {
 }
 
 
+
 function App() {
   return (
     <Router>
+      <Toaster position="top-center" reverseOrder={false} />
       <AppWrapper />
     </Router>
   );

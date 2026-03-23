@@ -111,6 +111,9 @@
   font-weight: 600;
   border-radius: 10px;
   text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
   transition: all 0.25s ease;
   display: flex;
   align-items: center;
