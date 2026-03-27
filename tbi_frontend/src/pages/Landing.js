@@ -1,39 +1,24 @@
 import React, { useState } from "react";
-import { UserPlus, LogIn, CheckCircle } from "lucide-react";
+import { UserPlus, LogIn } from "lucide-react";
 import Modal from "../components/Modal";
 import LoginForm from "../components/LoginForm";
 import SignupForm from "../components/SignupForm";
+import ToastNotification from "../components/ToastNotification";
 import './Landing.css';
 
 function Landing() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successUserName, setSuccessUserName] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [successRedirect, setSuccessRedirect] = useState("");
+  const [toast, setToast] = useState(null);
 
   const handleLoginSuccess = (userName) => {
     setIsLoginOpen(false);
-    setSuccessUserName(userName);
-    setSuccessMessage("Welcome back! Signing you in...");
-    setSuccessRedirect("/dashboard");
-    setShowSuccessModal(true);
+    setToast({ userName, message: "Successfully logged in!" });
   };
 
   const handleSignupSuccess = (userName) => {
     setIsSignupOpen(false);
-    setSuccessUserName(userName);
-    setSuccessMessage("Your account has been created successfully!");
-    setSuccessRedirect("/login");
-    setShowSuccessModal(true);
-  };
-
-  const handleSuccessClose = () => {
-    setShowSuccessModal(false);
-    if (successRedirect) {
-      window.location.href = successRedirect;
-    }
+    setToast({ userName, message: "Account created successfully!" });
   };
 
   return (
@@ -71,7 +56,7 @@ function Landing() {
         </div>
       </div>
 
-      {/* Login Modal */}
+      {/* Login Modal - centered */}
       <Modal 
         isOpen={isLoginOpen} 
         onClose={() => setIsLoginOpen(false)} 
@@ -91,7 +76,7 @@ function Landing() {
         </div>
       </Modal>
 
-      {/* Signup Modal */}
+      {/* Signup Modal - centered */}
       <Modal 
         isOpen={isSignupOpen} 
         onClose={() => setIsSignupOpen(false)} 
@@ -111,21 +96,14 @@ function Landing() {
         </div>
       </Modal>
 
-      {/* Success Modal - slides from right */}
-      <Modal
-        isOpen={showSuccessModal}
-        onClose={handleSuccessClose}
-        title="Success"
-      >
-        <div className="modal-inner-content">
-          <CheckCircle size={48} color="#4caf50" className="modal-icon" />
-          <p className="modal-user-name">{successUserName}</p>
-          <p className="modal-text">{successMessage}</p>
-          <button className="modal-action-btn" onClick={handleSuccessClose}>
-            Continue
-          </button>
-        </div>
-      </Modal>
+      {/* Toast Notification - slides from right */}
+      {toast && (
+        <ToastNotification
+          userName={toast.userName}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
 
       <p className="landing-footer">© {new Date().getFullYear()} ACLC College of Ormoc. All rights reserved.</p>
     </div>
