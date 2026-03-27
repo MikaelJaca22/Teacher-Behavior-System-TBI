@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UserPlus, LogIn } from "lucide-react";
+import { UserPlus, LogIn, CheckCircle } from "lucide-react";
 import Modal from "../components/Modal";
 import LoginForm from "../components/LoginForm";
 import SignupForm from "../components/SignupForm";
@@ -8,6 +8,33 @@ import './Landing.css';
 function Landing() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successUserName, setSuccessUserName] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [successRedirect, setSuccessRedirect] = useState("");
+
+  const handleLoginSuccess = (userName) => {
+    setIsLoginOpen(false);
+    setSuccessUserName(userName);
+    setSuccessMessage("Welcome back! Signing you in...");
+    setSuccessRedirect("/dashboard");
+    setShowSuccessModal(true);
+  };
+
+  const handleSignupSuccess = (userName) => {
+    setIsSignupOpen(false);
+    setSuccessUserName(userName);
+    setSuccessMessage("Your account has been created successfully!");
+    setSuccessRedirect("/login");
+    setShowSuccessModal(true);
+  };
+
+  const handleSuccessClose = () => {
+    setShowSuccessModal(false);
+    if (successRedirect) {
+      window.location.href = successRedirect;
+    }
+  };
 
   return (
     <div className="landing-container">
@@ -44,13 +71,13 @@ function Landing() {
         </div>
       </div>
 
-      {/* Modals */}
+      {/* Login Modal */}
       <Modal 
         isOpen={isLoginOpen} 
         onClose={() => setIsLoginOpen(false)} 
         title="Sign In"
       >
-        <LoginForm onSuccess={() => setIsLoginOpen(false)} />
+        <LoginForm onSuccess={handleLoginSuccess} />
         <div className="auth-switch" style={{marginTop: '20px', textAlign: 'center'}}>
           <p>
             Don't have an account?{" "}
@@ -64,12 +91,13 @@ function Landing() {
         </div>
       </Modal>
 
+      {/* Signup Modal */}
       <Modal 
         isOpen={isSignupOpen} 
         onClose={() => setIsSignupOpen(false)} 
         title="Create Account"
       >
-        <SignupForm onSuccess={() => setIsSignupOpen(false)} />
+        <SignupForm onSuccess={handleSignupSuccess} />
         <div className="auth-switch" style={{marginTop: '20px', textAlign: 'center'}}>
           <p>
             Already have an account?{" "}
@@ -80,6 +108,22 @@ function Landing() {
               Sign in here
             </button>
           </p>
+        </div>
+      </Modal>
+
+      {/* Success Modal - slides from right */}
+      <Modal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessClose}
+        title="Success"
+      >
+        <div className="modal-inner-content">
+          <CheckCircle size={48} color="#4caf50" className="modal-icon" />
+          <p className="modal-user-name">{successUserName}</p>
+          <p className="modal-text">{successMessage}</p>
+          <button className="modal-action-btn" onClick={handleSuccessClose}>
+            Continue
+          </button>
         </div>
       </Modal>
 

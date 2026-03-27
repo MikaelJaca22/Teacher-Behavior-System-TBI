@@ -1,10 +1,9 @@
 import { auth, db } from "../lib/firebase";
 import React, { useState } from "react";
-import { UserPlus, AlertCircle, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { UserPlus, AlertCircle, Loader2 } from "lucide-react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import toast from "react-hot-toast";
-import Modal from "./Modal";
 import '../pages/Login.css';
 import { useNavigate } from "react-router-dom";
 
@@ -16,10 +15,6 @@ function SignupForm({ onSuccess }) {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState("success");
-  const [modalMessage, setModalMessage] = useState("");
-  const [userName, setUserName] = useState("");
 
   const set = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
@@ -50,31 +45,17 @@ function SignupForm({ onSuccess }) {
         email: form.email,
         createdAt: new Date().toISOString(),
       });
-      setModalType("success");
-      setUserName(fullName);
-      setModalMessage("Your account has been created successfully!");
-      setShowModal(true);
-      if (onSuccess) onSuccess();
+      if (onSuccess) onSuccess(fullName);
       setTimeout(() => {
         navigate("/login");
-      }, 2500);
+      }, 1500);
     } catch (err) {
       console.error(err);
       const errorMessage = err.message.replace("Firebase: ", "");
       setError(errorMessage);
       toast.error(errorMessage);
-      setModalType("error");
-      setModalMessage(errorMessage);
-      setShowModal(true);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    if (modalType === "success") {
-      navigate("/login");
     }
   };
 
@@ -125,30 +106,6 @@ function SignupForm({ onSuccess }) {
           }
         </button>
       </form>
-
-      <Modal
-        isOpen={showModal}
-        onClose={handleCloseModal}
-        title={modalType === "success" ? "Welcome!" : "Registration Error"}
-      >
-        <div className="modal-inner-content">
-          {modalType === "success" ? (
-            <>
-              <CheckCircle size={48} color="#4caf50" className="modal-icon" />
-              <p className="modal-user-name">{userName}</p>
-              <p className="modal-text">{modalMessage}</p>
-            </>
-          ) : (
-            <>
-              <XCircle size={48} color="#f44336" className="modal-icon" />
-              <p className="modal-text">{modalMessage}</p>
-            </>
-          )}
-          <button className="modal-action-btn" onClick={handleCloseModal}>
-            {modalType === "success" ? "Continue to Login" : "Try Again"}
-          </button>
-        </div>
-      </Modal>
     </div>
   );
 }
