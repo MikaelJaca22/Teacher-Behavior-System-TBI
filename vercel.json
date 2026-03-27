@@ -1,7 +1,0 @@
-{
-  "outputDirectory": "tbi_frontend/build",
-  "cleanUrls": true,
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}
