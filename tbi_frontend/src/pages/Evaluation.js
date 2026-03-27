@@ -16,7 +16,9 @@ import {
   ChevronDown,
   Check,
   XCircle,
+  CheckCircle,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import DashboardLayout from "../components/DashboardLayout";
 import api from "../api";
 import "./Evaluation.css";
@@ -151,8 +153,8 @@ function Evaluation() {
   };
 
   const handleSubmit = async () => {
-    if (!allAnswered) { alert("Please answer all questions before submitting."); return; }
-    if (!selectedTeacher) { alert("Please select a teacher."); return; }
+    if (!allAnswered) { toast.error("Please answer all questions before submitting."); return; }
+    if (!selectedTeacher) { toast.error("Please select a teacher."); return; }
 
     try {
       setSubmitting(true);
@@ -177,12 +179,14 @@ function Evaluation() {
         student_last_name: studentInfo.lastName,
       });
 
-      alert("Evaluation submitted successfully!");
-      navigate("/dashboard");
+      toast.success("Evaluation submitted successfully!");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
     } catch (err) {
       const msg = err.response?.data?.error || "Failed to submit. Please try again.";
       setSubmitError(msg);
-      alert(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
