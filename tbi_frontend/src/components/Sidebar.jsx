@@ -10,6 +10,9 @@ import {
   X,
   GraduationCap,
 } from "lucide-react";
+import { auth } from "../lib/firebase";
+import { signOut } from "firebase/auth";
+import toast from "react-hot-toast";
 import api from "../api";
 import "./Sidebar.css";
 
@@ -18,8 +21,8 @@ function Sidebar() {
   const navigate = useNavigate();
   const [showTeachers, setShowTeachers] = useState(false);
   const [teachers, setTeachers] = useState([]);
-  const [isOpen, setIsOpen] = useState(false); // mobile drawer
-  const [isCollapsed, setIsCollapsed] = useState(false); // desktop collapse
+  const [isOpen, setIsOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     const fetchTeachers = async () => {
@@ -33,7 +36,6 @@ function Sidebar() {
     if (showTeachers) fetchTeachers();
   }, [showTeachers]);
 
-  // Close mobile drawer on route change
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
@@ -42,14 +44,23 @@ function Sidebar() {
     navigate(`/evaluation/${teacherId}`);
   };
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.clear();
+      toast.success("Logged out successfully!");
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (err) {
+      console.error("Logout error:", err);
+      localStorage.clear();
+      navigate("/");
+    }
   };
 
   const sidebarContent = (
     <>
-      {/* Header */}
       <div className="sidebar-header">
         <img src="/1.png" alt="ACLC Logo" />
         {!isCollapsed && (
@@ -60,7 +71,6 @@ function Sidebar() {
         )}
       </div>
 
-      {/* Nav */}
       <nav className="sidebar-nav">
         <Link
           to="/dashboard"
@@ -105,7 +115,6 @@ function Sidebar() {
         )}
       </nav>
 
-      {/* Logout */}
       <button className="logout-btn" onClick={handleLogout} title="Logout">
         <LogOut size={18} />
         {!isCollapsed && <span>Logout</span>}
@@ -115,7 +124,6 @@ function Sidebar() {
 
   return (
     <>
-      {/* Mobile top bar burger */}
       <button
         className="mobile-burger"
         onClick={() => setIsOpen(true)}
@@ -124,12 +132,10 @@ function Sidebar() {
         <Menu size={22} />
       </button>
 
-      {/* Mobile overlay */}
       {isOpen && (
         <div className="sidebar-overlay" onClick={() => setIsOpen(false)} />
       )}
 
-      {/* Mobile drawer */}
       <aside className={`sidebar sidebar-mobile ${isOpen ? "open" : ""}`}>
         <button
           className="sidebar-close-btn"
@@ -141,7 +147,6 @@ function Sidebar() {
         {sidebarContent}
       </aside>
 
-      {/* Desktop sidebar */}
       <aside className={`sidebar sidebar-desktop ${isCollapsed ? "collapsed" : ""}`}>
         <button
           className="collapse-btn"
