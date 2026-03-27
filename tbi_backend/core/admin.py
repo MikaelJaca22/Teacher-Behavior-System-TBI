@@ -102,10 +102,11 @@ class TeacherAdmin(admin.ModelAdmin):
         """Show average rating for this teacher"""
         avg = obj.evaluations.filter(rating__isnull=False).aggregate(Avg('rating'))['rating__avg']
         if avg:
+            avg_val = float(avg)
             return format_html(
                 '<span style="color: {};">{:.2f} / 5.0</span>',
-                '#28a745' if avg >= 4 else '#ffc107' if avg >= 3 else '#dc3545',
-                avg
+                '#28a745' if avg_val >= 4 else '#ffc107' if avg_val >= 3 else '#dc3545',
+                avg_val
             )
         return '-'
     avg_rating.short_description = 'Average Rating'
