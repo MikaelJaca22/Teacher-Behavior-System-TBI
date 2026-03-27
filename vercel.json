@@ -1,6 +1,11 @@
 {
-  "outputDirectory": "tbi_frontend/build",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/tbi_frontend/build/index.html" }
+  "builds": [
+    {
+      "src": "tbi_frontend/build/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "tbi_frontend/build/$1" }
   ]
 }
