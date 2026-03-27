@@ -12,6 +12,10 @@ import {
   X,
   Loader2,
   AlertCircle,
+  Search,
+  ChevronDown,
+  Check,
+  XCircle,
 } from "lucide-react";
 import DashboardLayout from "../components/DashboardLayout";
 import api from "../api";
@@ -28,13 +32,18 @@ function Evaluation() {
   const [teacher, setTeacher] = useState(null);
   const [teacherLoading, setTeacherLoading] = useState(false);
   const [answers, setAnswers] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [studentInfo, setStudentInfo] = useState({});
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
-  const [studentInfo, setStudentInfo] = useState({
-    email: "", uid: "", firstName: "", lastName: "", studentID: "",
-  });
+  // Filter teachers based on search term
+  const filteredTeachers = teachers.filter(teacher => 
+    teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    teacher.subject.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Load student data from Firebase/Firestore
   useEffect(() => {
@@ -84,6 +93,17 @@ function Evaluation() {
     };
     fetchTeachers();
   }, [teacherId]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isDropdownOpen && !e.target.closest('.teacher-search-dropdown')) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDropdownOpen]);
 
   // Load selected teacher details
   useEffect(() => {
@@ -220,20 +240,106 @@ function Evaluation() {
           </div>
         )}
 
-        {/* Teacher Selection */}
+        {/* Teacher Search & Selection */}
         <div className="card">
           <h3><User size={15} /> Select Teacher</h3>
-          <select
-            value={selectedTeacher}
-            onChange={(e) => { setSelectedTeacher(e.target.value); setAnswers({}); setComment(""); }}
-            className="teacher-select"
-            disabled={submitting}
-          >
-            <option value="">— Select a Teacher —</option>
-            {teachers.map((t) => (
-              <option key={t.id} value={t.id}>{t.name} · {t.subject}</option>
-            ))}
-          </select>
+          
+          <div className="teacher-search-dropdown">
+            <div 
+              className={`teacher-search-input ${isDropdownOpen ? 'active' : ''} ${selectedTeacher ? 'has-value' : ''}`}
+              onClick={() => !submitting && setIsDropdownOpen(!isDropdownOpen)}
+            >
+              {selectedTeacher ? (
+                <span className="selected-teacher-name">
+                  {teacher?.name || <Loader2 size={14} className="spin" />}
+                </span>
+              ) : (
+                <span className="search-placeholder-text">Search for a teacher...</span>
+              )}
+              <div className="search-input-actions">
+                {selectedTeacher && (
+                  <button 
+                    className="clear-btn"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedTeacher("");
+                      setTeacher(null);
+                      setAnswers({});
+                      setComment("");
+                    }}
+                    disabled={submitting}
+                  >
+                    <XCircle size={16} />
+                  </button>
+                )}
+                <ChevronDown size={18} className={`chevron ${isDropdownOpen ? 'open' : ''}`} />
+              </div>
+            </div>
+
+            {isDropdownOpen && (
+              <div className="teacher-dropdown-menu">
+                <div className="search-box">
+                  <Search size={16} />
+                  <input
+                    type="text"
+                    placeholder="Search by name or subject..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    autoFocus
+                    disabled={submitting}
+                  />
+                  {searchTerm && (
+                    <button 
+                      className="clear-search-btn"
+                      onClick={() => setSearchTerm("")}
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+                
+                <div className="teacher-list">
+                  {filteredTeachers.length > 0 ? (
+                    filteredTeachers.map((t) => (
+                      <div
+                        key={t.id}
+                        className={`teacher-option ${selectedTeacher === t.id ? 'selected' : ''}`}
+                        onClick={() => {
+                          setSelectedTeacher(t.id);
+                          setSearchTerm("");
+                          setIsDropdownOpen(false);
+                          setAnswers({});
+                          setComment("");
+                        }}
+                      >
+                        <div className="teacher-option-info">
+                          <span className="teacher-option-name">{t.name}</span>
+                          <span className="teacher-option-subject">{t.subject}</span>
+                        </div>
+                        {selectedTeacher === t.id && <Check size={16} className="check-icon" />}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="no-results-dropdown">
+                      <p>No teachers found</p>
+                      <span>Try a different search term</span>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="dropdown-footer">
+                  <span>{filteredTeachers.length} teacher{filteredTeachers.length !== 1 ? 's' : ''} available</span>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {selectedTeacher && !teacherLoading && (
+            <div className="selected-teacher-badge">
+              <Check size={14} />
+              Selected: {teacher?.name} · {teacher?.subject}
+            </div>
+          )}
         </div>
 
         {/* Teacher Details */}

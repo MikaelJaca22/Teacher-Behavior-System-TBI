@@ -10,7 +10,9 @@ import {
   Info, 
   Loader2, 
   GraduationCap, 
-  ChevronRight 
+  ChevronRight,
+  Search,
+  X
 } from "lucide-react";
 import "./Dashboard.css";
 
@@ -20,6 +22,7 @@ function Dashboard() {
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     // Listen for auth state changes and fetch user data from Firestore
@@ -62,6 +65,14 @@ function Dashboard() {
     navigate(`/evaluation/${teacherId}`);
   };
 
+  const filteredTeachers = teachers.filter((teacher) =>
+    teacher.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const clearSearch = () => {
+    setSearchTerm("");
+  };
+
   return (
     <DashboardLayout>
       <div className="dashboard-page">
@@ -102,6 +113,27 @@ function Dashboard() {
         {/* Teachers Section */}
         <div className="teachers-section">
           <h3 className="teachers-heading">Available Teachers</h3>
+          
+          <div className="search-bar-container">
+            <Search size={18} className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search teacher by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+            {searchTerm && (
+              <button className="clear-search-btn" onClick={clearSearch}>
+                <X size={16} />
+              </button>
+            )}
+          </div>
+          {searchTerm && (
+            <p className="search-results-count">
+              {filteredTeachers.length} {filteredTeachers.length === 1 ? "result" : "results"} for "{searchTerm}"
+            </p>
+          )}
 
           {loading && (
             <div className="state-box">
@@ -118,13 +150,13 @@ function Dashboard() {
 
           {!loading && !error && (
             <div className="teachers-grid">
-              {teachers.length === 0 ? (
+              {filteredTeachers.length === 0 ? (
                 <div className="state-box">
                   <GraduationCap size={32} opacity={0.4} />
-                  <p>No teachers available.</p>
+                  <p>{searchTerm ? "No teachers found matching your search." : "No teachers available."}</p>
                 </div>
               ) : (
-                teachers.map((teacher) => (
+                filteredTeachers.map((teacher) => (
                   <div
                     key={teacher.id}
                     className="teacher-card"
