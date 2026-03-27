@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogIn, AlertCircle, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { LogIn, AlertCircle, Loader2 } from "lucide-react";
 import { auth, db } from "../lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { collection, query, where, getDocs } from "firebase/firestore";
