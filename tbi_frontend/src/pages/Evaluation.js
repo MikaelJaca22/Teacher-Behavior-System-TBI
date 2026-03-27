@@ -16,7 +16,6 @@ import {
   ChevronDown,
   Check,
   XCircle,
-  CheckCircle,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import DashboardLayout from "../components/DashboardLayout";
@@ -36,93 +35,9 @@ function Evaluation() {
   const [answers, setAnswers] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [studentInfo, setStudentInfo] = useState({});
+  const [studentInfo, setStudentInfo] = useState(null);
   const [comment, setComment] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
-
-  // Filter teachers based on search term
-  const filteredTeachers = teachers.filter(teacher => 
-    teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    teacher.subject.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Load student data from Firebase/Firestore
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setStudentInfo({
-              email: userData.email,
-              uid: firebaseUser.uid,
-              firstName: userData.firstName,
-              lastName: userData.lastName,
-              studentID: userData.studentID,
-            });
-          }
-        } catch (err) {
-          console.error("Error fetching student data:", err);
-        }
-      } else {
-        // Not logged in
-        navigate("/login");
-      }
-    });
-    return () => unsubscribe();
-  }, [navigate]);
-
-  // Load teachers
-  useEffect(() => {
-    const fetchTeachers = async () => {
-      try {
-        setTeachersLoading(true);
-        const res = await api.get("/teachers/");
-        const teachersList = res.data.teachers || [];
-        setTeachers(teachersList);
-        
-        // If teacherId is in URL, set it as selected teacher
-        if (teacherId) {
-          setSelectedTeacher(teacherId);
-        }
-      } catch {
-        setTeachersError("Failed to load teachers.");
-      } finally {
-        setTeachersLoading(false);
-      }
-    };
-    fetchTeachers();
-  }, [teacherId]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (isDropdownOpen && !e.target.closest('.teacher-search-dropdown')) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isDropdownOpen]);
-
-  // Load selected teacher details
-  useEffect(() => {
-    if (!selectedTeacher) { setTeacher(null); return; }
-    const fetchTeacher = async () => {
-      try {
-        setTeacherLoading(true);
-        const res = await api.get(`/teachers/${selectedTeacher}/`);
-        setTeacher(res.data.teacher);
-      } catch {
-        setTeacher(null);
-      } finally {
-        setTeacherLoading(false);
-      }
-    };
-    fetchTeacher();
-  }, [selectedTeacher]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const sections = {
     "A. Class Management": [
@@ -145,21 +60,106 @@ function Evaluation() {
   };
 
   const totalQuestions = Object.values(sections).flat().length;
-  const answeredCount = Object.keys(answers).length;
-  const allAnswered = answeredCount === totalQuestions;
+
+  const filteredTeachers = teachers.filter(teacher => 
+    teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    teacher.subject.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setStudentInfo({
+              email: userData.email,
+              uid: firebaseUser.uid,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              studentID: userData.studentID,
+            });
+          }
+        } catch (err) {
+          console.error("Error fetching student data:", err);
+        }
+      } else {
+        navigate("/login");
+      }
+    });
+    return () => unsubscribe();
+  }, [navigate]);
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        setTeachersLoading(true);
+        const res = await api.get("/teachers/");
+        const teachersList = res.data.teachers || [];
+        setTeachers(teachersList);
+        if (teacherId) {
+          setSelectedTeacher(teacherId);
+        }
+      } catch {
+        setTeachersError("Failed to load teachers. Please refresh the page.");
+      } finally {
+        setTeachersLoading(false);
+      }
+    };
+    fetchTeachers();
+  }, [teacherId]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isDropdownOpen && !e.target.closest('.teacher-search-dropdown')) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isDropdownOpen]);
+
+  useEffect(() => {
+    if (!selectedTeacher) { setTeacher(null); return; }
+    const fetchTeacher = async () => {
+      try {
+        setTeacherLoading(true);
+        const res = await api.get(`/teachers/${selectedTeacher}/`);
+        setTeacher(res.data.teacher);
+      } catch {
+        setTeacher(null);
+      } finally {
+        setTeacherLoading(false);
+      }
+    };
+    fetchTeacher();
+  }, [selectedTeacher]);
 
   const handleChange = (question, value) => {
     setAnswers((prev) => ({ ...prev, [question]: value }));
   };
 
   const handleSubmit = async () => {
-    if (!allAnswered) { toast.error("Please answer all questions before submitting."); return; }
-    if (!selectedTeacher) { toast.error("Please select a teacher."); return; }
+    console.log("Submit clicked");
+    console.log("selectedTeacher:", selectedTeacher);
+    console.log("answers:", answers);
+    console.log("studentInfo:", studentInfo);
+
+    if (!selectedTeacher) {
+      toast.error("Please select a teacher first.");
+      return;
+    }
+
+    const answeredCount = Object.keys(answers).length;
+    if (answeredCount < totalQuestions) {
+      toast.error(`Please answer all questions. ${answeredCount}/${totalQuestions} answered.`);
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
-      setSubmitting(true);
-      setSubmitError(null);
-
       const ratings = Object.values(answers).map(Number);
       const rating = Math.round(ratings.reduce((a, b) => a + b, 0) / ratings.length);
       const allQuestions = Object.values(sections).flat();
@@ -168,7 +168,7 @@ function Evaluation() {
         rating: Number(answers[q]),
       }));
 
-      await api.post("/evaluations/", {
+      const payload = {
         teacher_id: parseInt(selectedTeacher),
         rating,
         comments: comment || "",
@@ -177,24 +177,34 @@ function Evaluation() {
         student_id: studentInfo.studentID || studentInfo.uid,
         student_first_name: studentInfo.firstName,
         student_last_name: studentInfo.lastName,
-      });
+      };
+
+      console.log("Sending payload:", payload);
+
+      const response = await api.post("/evaluations/", payload);
+      console.log("Response:", response);
 
       toast.success("Evaluation submitted successfully!");
+      
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
     } catch (err) {
-      const msg = err.response?.data?.error || "Failed to submit. Please try again.";
-      setSubmitError(msg);
-      toast.error(msg);
+      console.error("Submit error:", err);
+      const errorMsg = err.response?.data?.error || "Failed to submit evaluation. Please try again.";
+      toast.error(errorMsg);
     } finally {
-      setSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
   const handleCancel = () => {
-    if (window.confirm("Cancel evaluation? Your progress will be lost.")) navigate("/dashboard");
+    if (window.confirm("Cancel evaluation? Your progress will be lost.")) {
+      navigate("/dashboard");
+    }
   };
+
+  const answeredCount = Object.keys(answers).length;
 
   if (teachersLoading) {
     return (
@@ -216,8 +226,8 @@ function Evaluation() {
           <div className="eval-state">
             <AlertCircle size={32} color="#e30613" />
             <p>{teachersError}</p>
-            <button className="btn-submit" onClick={() => navigate("/dashboard")}>
-              Return to Dashboard
+            <button className="btn-submit" onClick={() => window.location.reload()}>
+              Retry
             </button>
           </div>
         </div>
@@ -230,8 +240,7 @@ function Evaluation() {
       <div className="evaluation-page">
         <h2 className="eval-title">Evaluation Form</h2>
 
-        {/* Student Info */}
-        {studentInfo.email && (
+        {studentInfo && (
           <div className="student-info-card">
             <User size={20} className="student-icon" />
             <div>
@@ -244,14 +253,13 @@ function Evaluation() {
           </div>
         )}
 
-        {/* Teacher Search & Selection */}
         <div className="card">
           <h3><User size={15} /> Select Teacher</h3>
           
           <div className="teacher-search-dropdown">
             <div 
               className={`teacher-search-input ${isDropdownOpen ? 'active' : ''} ${selectedTeacher ? 'has-value' : ''}`}
-              onClick={() => !submitting && setIsDropdownOpen(!isDropdownOpen)}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               {selectedTeacher ? (
                 <span className="selected-teacher-name">
@@ -271,7 +279,6 @@ function Evaluation() {
                       setAnswers({});
                       setComment("");
                     }}
-                    disabled={submitting}
                   >
                     <XCircle size={16} />
                   </button>
@@ -290,7 +297,6 @@ function Evaluation() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     autoFocus
-                    disabled={submitting}
                   />
                   {searchTerm && (
                     <button 
@@ -326,7 +332,6 @@ function Evaluation() {
                   ) : (
                     <div className="no-results-dropdown">
                       <p>No teachers found</p>
-                      <span>Try a different search term</span>
                     </div>
                   )}
                 </div>
@@ -346,7 +351,6 @@ function Evaluation() {
           )}
         </div>
 
-        {/* Teacher Details */}
         {teacherLoading && (
           <div className="eval-state" style={{ padding: "1rem" }}>
             <Loader2 size={20} className="spin" />
@@ -365,7 +369,6 @@ function Evaluation() {
           </div>
         )}
 
-        {/* Instructions */}
         <div className="card">
           <h3><Info size={15} /> Instructions</h3>
           <p style={{ fontSize: "0.875rem", color: "#555", margin: "0 0 0.75rem" }}>
@@ -386,7 +389,6 @@ function Evaluation() {
           )}
         </div>
 
-        {/* Sections */}
         {selectedTeacher && Object.entries(sections).map(([section, questions]) => (
           <div className="card" key={section}>
             <h3>{section}</h3>
@@ -403,7 +405,6 @@ function Evaluation() {
                         value={num}
                         checked={answers[q] === num}
                         onChange={() => handleChange(q, num)}
-                        disabled={submitting}
                       />
                       <label htmlFor={`${q}-${num}`}>{num}</label>
                     </React.Fragment>
@@ -414,7 +415,6 @@ function Evaluation() {
           </div>
         ))}
 
-        {/* Comments */}
         {selectedTeacher && (
           <div className="card">
             <h3><MessageSquare size={15} /> Comments & Suggestions <span style={{ fontWeight: 400, color: "#9ca3af" }}>(Optional)</span></h3>
@@ -423,33 +423,23 @@ function Evaluation() {
               placeholder="Share any additional feedback…"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              disabled={submitting}
             />
           </div>
         )}
 
-        {/* Error */}
-        {submitError && (
-          <div className="error-banner">
-            <AlertCircle size={16} />
-            {submitError}
-          </div>
-        )}
-
-        {/* Actions */}
         <div className="eval-actions">
-          <button className="btn-cancel" onClick={handleCancel} disabled={submitting}>
+          <button className="btn-cancel" onClick={handleCancel}>
             <X size={15} /> Cancel
           </button>
           <button
             className="btn-submit"
             onClick={handleSubmit}
-            disabled={submitting}
           >
-            {submitting
-              ? <><Loader2 size={15} className="spin" /> Submitting…</>
-              : <><Send size={15} /> Submit Evaluation</>
-            }
+            {isSubmitting ? (
+              <><Loader2 size={15} className="spin" /> Submitting…</>
+            ) : (
+              <><Send size={15} /> Submit Evaluation</>
+            )}
           </button>
         </div>
       </div>
