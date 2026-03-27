@@ -109,10 +109,7 @@ class TeacherAdmin(admin.ModelAdmin):
                 color = 'orange'
             else:
                 color = 'red'
-            return format_html(
-                '<span style="color: {};">{:.2f} / 5.0</span>',
-                color, avg_val
-            )
+            return f'<span style="color:{color};">{avg_val:.2f} / 5.0</span>'
         return '-'
     avg_rating.short_description = 'Average Rating'
 
