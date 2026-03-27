@@ -1,11 +1,7 @@
 {
-  "builds": [
-    {
-      "src": "tbi_frontend/build/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "tbi_frontend/build/$1" }
+  "outputDirectory": "tbi_frontend/build",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
