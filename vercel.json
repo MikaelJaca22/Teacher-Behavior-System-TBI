@@ -1,7 +1,4 @@
 {
   "buildCommand": "cd tbi_frontend && npm install && npm run build",
-  "outputDirectory": "tbi_frontend/build",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/tbi_frontend/build/index.html" }
-  ]
+  "outputDirectory": "tbi_frontend/build"
 }
