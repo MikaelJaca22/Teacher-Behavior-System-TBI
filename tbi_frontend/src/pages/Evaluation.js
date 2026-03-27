@@ -444,7 +444,7 @@ function Evaluation() {
           <button
             className="btn-submit"
             onClick={handleSubmit}
-            disabled={submitting || !selectedTeacher || !allAnswered}
+            disabled={submitting}
           >
             {submitting
               ? <><Loader2 size={15} className="spin" /> Submitting…</>
