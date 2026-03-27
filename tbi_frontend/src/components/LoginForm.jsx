@@ -15,8 +15,9 @@ function LoginForm({ onSuccess }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState("success"); // "success" or "error"
+  const [modalType, setModalType] = useState("success");
   const [modalMessage, setModalMessage] = useState("");
+  const [userName, setUserName] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -30,7 +31,6 @@ function LoginForm({ onSuccess }) {
       if (snapshot.empty) {
         setError("Student ID not found.");
         toast.error("Student ID not found.");
-        // toast.error("Student ID not found."); // Original toast
         setModalType("error");
         setModalMessage("Student ID not found.");
         setShowModal(true);
@@ -38,13 +38,16 @@ function LoginForm({ onSuccess }) {
         return;
       }
 
-      const email = snapshot.docs[0].data().email;
+      const userData = snapshot.docs[0].data();
+      const fullName = `${userData.firstName || ""} ${userData.lastName || ""}`.trim();
+      const email = userData.email;
+      
       await signInWithEmailAndPassword(auth, email, password);
       setModalType("success");
+      setUserName(fullName);
       setModalMessage("Welcome back! Signing you in...");
       setShowModal(true);
       if (onSuccess) onSuccess();
-      // Delay navigation to let user see the modal
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
@@ -59,7 +62,7 @@ function LoginForm({ onSuccess }) {
         msg = "Too many failed attempts. Please try again later.";
       }
       setError(msg);
-      // toast.error(msg); // Optional: if we want to also keep toast
+      toast.error(msg);
       setModalType("error");
       setModalMessage(msg);
       setShowModal(true);
@@ -119,15 +122,21 @@ function LoginForm({ onSuccess }) {
       <Modal
         isOpen={showModal}
         onClose={handleCloseModal}
-        title={modalType === "success" ? "Success" : "Error"}
+        title={modalType === "success" ? "Welcome!" : "Error"}
       >
         <div className="modal-inner-content">
           {modalType === "success" ? (
-            <CheckCircle size={48} color="#4caf50" className="modal-icon" />
+            <>
+              <CheckCircle size={48} color="#4caf50" className="modal-icon" />
+              <p className="modal-user-name">{userName}</p>
+              <p className="modal-text">{modalMessage}</p>
+            </>
           ) : (
-            <XCircle size={48} color="#f44336" className="modal-icon" />
+            <>
+              <XCircle size={48} color="#f44336" className="modal-icon" />
+              <p className="modal-text">{modalMessage}</p>
+            </>
           )}
-          <p className="modal-text">{modalMessage}</p>
           <button className="modal-action-btn" onClick={handleCloseModal}>
             {modalType === "success" ? "Continue to Dashboard" : "Try Again"}
           </button>
