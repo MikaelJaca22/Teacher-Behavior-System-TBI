@@ -199,9 +199,7 @@ function Evaluation() {
   };
 
   const handleCancel = () => {
-    if (window.confirm("Cancel evaluation? Your progress will be lost.")) {
-      navigate("/dashboard");
-    }
+    navigate("/dashboard");
   };
 
   const answeredCount = Object.keys(answers).length;
