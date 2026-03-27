@@ -1,13 +1,7 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "tbi_frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "build" }
-    }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "tbi_frontend/build/$1" }
+  "buildCommand": "cd tbi_frontend && npm install && npm run build",
+  "outputDirectory": "tbi_frontend/build",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/tbi_frontend/build/index.html" }
   ]
 }
