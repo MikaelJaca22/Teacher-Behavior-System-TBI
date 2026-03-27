@@ -106,7 +106,7 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
-  min-width: 0;       /* prevents grid child from blowing out */
+  min-width: 0;
   box-sizing: border-box;
 }
 
@@ -207,30 +207,6 @@
   color: var(--red);
 }
 
-/* ── Name grid (Signup) ── */
-.name-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 0.75rem;
-  min-width: 0; /* prevent overflow */
-}
-
-.name-grid .input-group {
-  min-width: 0; /* allow shrinking */
-}
-
-.name-grid .input-group input {
-  width: 100%;
-  box-sizing: border-box; /* include padding in width */
-  min-width: 0;
-}
-
-@media (max-width: 400px) {
-  .name-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ── Divider ── */
 .form-divider {
   display: flex;
@@ -249,7 +225,7 @@
   background: #e5e7eb;
 }
 
-/* ── Responsive ── */
+/* ── Mobile Responsive ── */
 @media (max-width: 768px) {
   .login-left {
     display: none;
@@ -263,5 +239,66 @@
 
   .login-form-container {
     padding: 2rem 1.5rem;
+    border-radius: 12px;
+  }
+
+  .login-form-container h2 {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-right {
+    padding: 1rem 0.75rem;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
+  .login-form-container {
+    padding: 1.5rem 1.25rem;
+    border-radius: 12px;
+    max-width: 100%;
+  }
+
+  .login-form-container h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .input-group {
+    margin-bottom: 0.8rem;
+  }
+
+  .input-group input {
+    padding: 12px 14px;
+    font-size: 0.95rem;
+  }
+
+  .name-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .login-submit {
+    padding: 13px;
+    font-size: 1rem;
+  }
+
+  .auth-switch {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .login-form-container {
+    padding: 1.25rem 1rem;
+  }
+
+  .login-form-container h2 {
+    font-size: 1.2rem;
+  }
+
+  .input-group label {
+    font-size: 0.8rem;
   }
 }

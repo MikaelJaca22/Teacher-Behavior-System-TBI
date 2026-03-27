@@ -11,19 +11,22 @@
   align-items: center;
   z-index: 1000;
   animation: fadeIn 0.3s ease-out;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
 .modal-content {
   background: white;
   width: 90%;
   max-width: 500px;
+  max-height: 90vh;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   padding: 24px;
   position: relative;
   animation: slideUp 0.3s ease-out;
-  max-height: 90vh;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .modal-header {
@@ -164,4 +167,82 @@
 @keyframes slideOutToRight {
   from { transform: translateX(0); opacity: 1; }
   to { transform: translateX(100%); opacity: 0; }
+}
+
+/* ── Mobile Responsive ── */
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 0.75rem;
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    padding: 20px;
+    max-height: 80vh;
+  }
+
+  .modal-header h3 {
+    font-size: 1.25rem;
+  }
+
+  .modal-inner-content {
+    padding: 15px 0;
+  }
+
+  .modal-icon {
+    margin-bottom: 15px;
+  }
+
+  .modal-icon svg {
+    width: 40px;
+    height: 40px;
+  }
+
+  .modal-user-name {
+    font-size: 1.1rem;
+  }
+
+  .modal-text {
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+
+  .modal-action-btn {
+    padding: 14px 20px;
+    font-size: 0.95rem;
+  }
+
+  .toast-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: 100%;
+    padding: 16px 20px;
+  }
+}
+
+@media (max-width: 360px) {
+  .modal-content {
+    padding: 16px;
+  }
+
+  .modal-header h3 {
+    font-size: 1.15rem;
+  }
+
+  .toast-notification {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+
+  .toast-notification .toast-user-name {
+    font-size: 1rem;
+  }
+
+  .toast-notification .toast-message {
+    font-size: 0.85rem;
+  }
 }
