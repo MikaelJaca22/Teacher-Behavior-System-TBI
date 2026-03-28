@@ -19,9 +19,19 @@
   margin: 0;
 }
 
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 /* On mobile, push title to account for burger button */
 @media (max-width: 768px) {
   .navbar-title {
     padding-left: 48px;
+  }
+
+  .navbar-right {
+    display: none;
   }
 }

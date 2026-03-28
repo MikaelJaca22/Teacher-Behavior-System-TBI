@@ -5,7 +5,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from .models import Student, Teacher, Evaluation, EvaluationAnswer, EvaluationPeriod
-from .serializers import StudentSerializer, TeacherSerializer, EvaluationSerializer, EvaluationCreateSerializer
+from .serializers import (
+    StudentSerializer, TeacherSerializer, EvaluationSerializer, 
+    EvaluationCreateSerializer, EvaluationPeriodSerializer, 
+    EvaluationPeriodListSerializer
+)
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
@@ -32,9 +36,9 @@ class StudentLoginAPIView(APIView):
 
 
 class TeacherListAPIView(APIView):
-    """GET: Retrieve all teachers"""
+    """GET: Retrieve all active teachers"""
     def get(self, request):
-        teachers = Teacher.objects.all()
+        teachers = Teacher.objects.filter(is_active=True)
         serializer = TeacherSerializer(teachers, many=True)
         return Response({"success": True, "teachers": serializer.data})
 
@@ -132,16 +136,24 @@ class EvaluationCreateAPIView(APIView):
                 student.save()
         
         # Get or create an active evaluation period
-        evaluation_period, created = EvaluationPeriod.objects.get_or_create(
-            status='active',
-            defaults={
-                'name': 'Academic Year 2025-2026',
-                'academic_year': '2025-2026',
-                'semester': 'first',
-                'start_date': timezone.now(),
-                'end_date': timezone.now() + timedelta(days=120),
-            }
-        )
+        evaluation_period_id = request.data.get('evaluation_period_id')
+        
+        if evaluation_period_id:
+            try:
+                evaluation_period = EvaluationPeriod.objects.get(
+                    id=evaluation_period_id,
+                    status='active'
+                )
+            except EvaluationPeriod.DoesNotExist:
+                evaluation_period = None
+        else:
+            evaluation_period = EvaluationPeriod.objects.filter(status='active').first()
+        
+        if not evaluation_period:
+            return Response({
+                "success": False,
+                "error": "No active evaluation period found. Please try again later."
+            }, status=status.HTTP_400_BAD_REQUEST)
         
         # Check if student already evaluated this teacher in this period
         existing_evaluation = Evaluation.objects.filter(
@@ -274,3 +286,74 @@ class StudentEvaluationHistoryAPIView(APIView):
             "evaluations": evaluation_data,
             "total_evaluations": len(evaluation_data)
         })
+
+
+class EvaluationPeriodListAPIView(APIView):
+    """GET: List all evaluation periods"""
+    def get(self, request):
+        periods = EvaluationPeriod.objects.all().order_by('-start_date')
+        serializer = EvaluationPeriodListSerializer(periods, many=True)
+        return Response({
+            "success": True,
+            "periods": serializer.data
+        })
+
+
+class CurrentPeriodAPIView(APIView):
+    """GET: Get the current active evaluation period"""
+    def get(self, request):
+        current_period = EvaluationPeriod.objects.filter(status='active').first()
+        
+        if not current_period:
+            current_period = self._create_next_period()
+        
+        if current_period:
+            serializer = EvaluationPeriodSerializer(current_period)
+            return Response({
+                "success": True,
+                "current_period": serializer.data,
+                "is_new": getattr(current_period, '_is_newly_created', False)
+            })
+        else:
+            return Response({
+                "success": False,
+                "error": "No active evaluation period available"
+            }, status=status.HTTP_404_NOT_FOUND)
+    
+    def _create_next_period(self):
+        """Auto-create next semester when needed"""
+        last_period = EvaluationPeriod.objects.order_by('-created_at').first()
+        
+        if not last_period:
+            return None
+        
+        current_year = timezone.now().year
+        current_month = timezone.now().month
+        
+        if last_period.semester == 'first':
+            new_semester = 'second'
+            new_year = last_period.academic_year.split('-')[0] + '-' + str(int(last_period.academic_year.split('-')[0]) + 1)
+        else:
+            new_semester = 'first'
+            new_year = str(current_year) + '-' + str(current_year + 1)
+        
+        if new_semester == 'first':
+            start_month, end_month = 8, 12
+        else:
+            start_month, end_month = 1, 5
+        
+        try:
+            new_period = EvaluationPeriod.objects.create(
+                name=f'Academic Year {new_year}',
+                academic_year=new_year,
+                semester=new_semester,
+                evaluation_type='final',
+                start_date=timezone.make_aware(timezone.datetime(current_year if new_semester == 'second' else current_year, start_month, 1)),
+                end_date=timezone.make_aware(timezone.datetime(current_year if new_semester == 'second' else current_year + 1, end_month, 15)),
+                status='active',
+                is_active=True,
+            )
+            new_period._is_newly_created = True
+            return new_period
+        except Exception:
+            return None

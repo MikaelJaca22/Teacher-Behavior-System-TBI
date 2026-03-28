@@ -11,4 +11,11 @@ const api = axios.create({
   },
 });
 
+export const getCurrentPeriod = () => api.get('/evaluation-periods/current/');
+export const getPeriods = () => api.get('/evaluation-periods/');
+export const getTeachers = (periodId) => {
+  const params = periodId ? `/?period_id=${periodId}` : '/';
+  return api.get(`/teachers/${params}`);
+};
+
 export default api;

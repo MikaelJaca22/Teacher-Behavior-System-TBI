@@ -22,7 +22,9 @@ from core.views import (
     TeacherListAPIView, 
     TeacherDetailAPIView, 
     EvaluationCreateAPIView,
-    StudentEvaluationHistoryAPIView  # NEW - Import the new view
+    StudentEvaluationHistoryAPIView,
+    EvaluationPeriodListAPIView,
+    CurrentPeriodAPIView
 )
 from django.shortcuts import redirect
 
@@ -38,6 +40,10 @@ urlpatterns = [
     path('student-evaluations/<str:student_email>/', 
          StudentEvaluationHistoryAPIView.as_view(), 
          name='student-evaluation-history'),
+    
+    # Evaluation Period endpoints
+    path('evaluation-periods/', EvaluationPeriodListAPIView.as_view(), name='evaluation-periods'),
+    path('evaluation-periods/current/', CurrentPeriodAPIView.as_view(), name='current-period'),
     
     path('', lambda request: redirect('student-login')),
 ]

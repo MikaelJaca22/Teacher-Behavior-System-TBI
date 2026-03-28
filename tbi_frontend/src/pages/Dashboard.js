@@ -4,7 +4,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../lib/firebase";
 import DashboardLayout from "../components/DashboardLayout";
-import api from "../api";
+import SemesterBanner from "../components/SemesterBanner";
+import api, { getCurrentPeriod, getTeachers } from "../api";
 import { 
   ClipboardList, 
   Info, 
@@ -21,11 +22,12 @@ function Dashboard() {
   const navigate = useNavigate();
   const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [periodLoading, setPeriodLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPeriod, setCurrentPeriod] = useState(null);
 
   useEffect(() => {
-    // Listen for auth state changes and fetch user data from Firestore
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
@@ -45,10 +47,29 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
+    const fetchPeriod = async () => {
+      try {
+        const response = await getCurrentPeriod();
+        if (response.data.success) {
+          setCurrentPeriod(response.data.current_period);
+        }
+      } catch (err) {
+        console.error("Error fetching current period:", err);
+      } finally {
+        setPeriodLoading(false);
+      }
+    };
+
+    fetchPeriod();
+  }, []);
+
+  useEffect(() => {
     const fetchTeachers = async () => {
+      if (!currentPeriod) return;
+      
       try {
         setLoading(true);
-        const response = await api.get("/teachers/");
+        const response = await getTeachers(currentPeriod.id);
         setTeachers(response.data?.teachers || []);
         setError(null);
       } catch (err) {
@@ -59,10 +80,14 @@ function Dashboard() {
       }
     };
     fetchTeachers();
-  }, []);
+  }, [currentPeriod]);
 
   const handleTeacherClick = (teacherId) => {
-    navigate(`/evaluation/${teacherId}`);
+    if (currentPeriod) {
+      navigate(`/evaluation/${teacherId}?period_id=${currentPeriod.id}`);
+    } else {
+      navigate(`/evaluation/${teacherId}`);
+    }
   };
 
   const filteredTeachers = teachers.filter((teacher) =>
@@ -76,7 +101,6 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <div className="dashboard-page">
-        {/* Hero */}
         <div className="dashboard-hero">
           <h2 className="dashboard-title">Welcome, {userName}</h2>
           <p className="dashboard-subtitle">
@@ -84,7 +108,8 @@ function Dashboard() {
           </p>
         </div>
 
-        {/* Info Cards */}
+        <SemesterBanner period={currentPeriod} loading={periodLoading} />
+
         <div className="dashboard-cards">
           <div className="info-card">
             <div className="info-card-icon">
@@ -110,7 +135,6 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Teachers Section */}
         <div className="teachers-section">
           <h3 className="teachers-heading">Available Teachers</h3>
           
@@ -135,7 +159,7 @@ function Dashboard() {
             </p>
           )}
 
-          {loading && (
+          {(loading || periodLoading) && (
             <div className="state-box">
               <Loader2 size={28} className="spin" />
               <p>Loading teachers…</p>
@@ -148,7 +172,7 @@ function Dashboard() {
             </div>
           )}
 
-          {!loading && !error && (
+          {!loading && !periodLoading && !error && (
             <div className="teachers-grid">
               {filteredTeachers.length === 0 ? (
                 <div className="state-box">
