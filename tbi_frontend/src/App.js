@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import TeacherList from "./pages/TeacherList";
 import Evaluation from "./pages/Evaluation";
 import StudentLogin from "./pages/StudentLogin";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Loader from "./components/Loader";
 import './styles.css';
 
@@ -34,13 +35,29 @@ function AppWrapper() {
         <div className="page-fade">
           <Routes location={displayLocation}>
             <Route path="/" element={<Landing />} />
-            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/student-login" element={<StudentLogin />} />
-            <Route path="/teachers" element={<TeacherList />} />
-            <Route path="/evaluation" element={<Evaluation />} />
-            <Route path="/evaluation/:teacherId" element={<Evaluation />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/teachers" element={
+              <ProtectedRoute>
+                <TeacherList />
+              </ProtectedRoute>
+            } />
+            <Route path="/evaluation" element={
+              <ProtectedRoute>
+                <Evaluation />
+              </ProtectedRoute>
+            } />
+            <Route path="/evaluation/:teacherId" element={
+              <ProtectedRoute>
+                <Evaluation />
+              </ProtectedRoute>
+            } />
           </Routes>
         </div>
       )}
